@@ -343,7 +343,6 @@ object HelloScala {
 //        println(HelloJava.sum(bufferAsJavaList(ListBuffer(1,2,3,4,5,6))))
 //        println(HelloJava.sum(bufferAsJavaList(ArrayBuffer(1,2,3,4,5,6))))
 
-        println("hello scala")
 
     }
 }
