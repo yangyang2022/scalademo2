@@ -1,0 +1,43 @@
+
+1:类型成员 && 参数化类型
+ abstract class BulkRead{
+    type In
+    val source:In
+    def read:String
+ }
+ class StringBulkReader(val source:String) extends BulkReader{
+    type In = String
+    def read:String = source
+ }
+
+2: 方法调用链: def isEven = (s:Int) => s % 2 == 0
+                  List(1,2,3,4,5,6) filter isEven foreach println
+
+3: scala中任何以:结尾的方法均与其右边对象绑定,他们并不与左边对象绑定
+   例如: :: , 'a'::List('b') == List.::('a')
+
+4:object Manager{
+      def apply[R<:{def close():Unit},T](resource: => R)(f:R=>T)={
+          var res:Option[R] = None
+          try {
+              res = Some(resource)
+              f(res.get)
+          }catch {
+              case NonFatal(ex) => println(s"Non fatal exception: ${ex}")
+          }finally {
+              if(res != None){
+                  println("Closing resource... ")
+                  res.get.close()
+              }
+          }
+      }
+  }
+  def countLines(filename:String) ={
+              val path = this.getClass.getClassLoader.getResource(filename).getPath
+              Manager(Source.fromFile(path)){source=>
+                  val size = source.getLines().size
+                  println(s"file ${filename} has ${size} lines")
+                  if(size > 10) throw new RuntimeException("Big File")
+              }
+          }
+          countLines("scala.txt")

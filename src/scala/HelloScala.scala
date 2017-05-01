@@ -8,6 +8,7 @@ import scala.collection.immutable.ListMap
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.io.Source
+import scala.util.Random
 
 /**
   * Created by yy on 2017/4/29.
@@ -344,7 +345,51 @@ object HelloScala {
 //        println(HelloJava.sum(bufferAsJavaList(ArrayBuffer(1,2,3,4,5,6))))
 
 
+//        val ints = new LinkList[Int]()
+//        ints.add(1)
+//        ints.add(2)
+//        ints.add(3)
+//        ints.printlAll()
+
+
+//        def randomName(names:Seq[String]):String = {
+//            val random = new Random().nextInt(names.length)
+//            return names(random)
+//        }
+//        println(randomName(Seq("hello","world","shen","yang","yang2","haha")))
+
+//        def callSpeack[A <: {def speak():Unit}](obj:A): Unit ={
+//            obj.speak()
+//        }
+
+//        callSpeack(new Dog)
+//        callSpeack(new DD)
+//        callSpeack(new King)
     }
+}
+class Dog{def speak(){println("dog speack ... ")}}
+class King{def speak(){println("king speak... ")}}
+class DD
+
+class LinkList[A]{
+    private class Node[A](elem:A){
+        var next:Node[A] = _
+        override def toString: String = elem.toString
+    }
+    private var head:Node[A] = _
+    def add(elem:A): Unit ={
+        val n = new Node(elem)
+        n.next = head
+        head = n
+    }
+
+    private def printNode(n:Node[A]): Unit ={
+        if(n != null){
+            println(n)
+            printNode(n.next)
+        }
+    }
+    def printlAll(){printNode(head)}
 }
 
 class Printer{

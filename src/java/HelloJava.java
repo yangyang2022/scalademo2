@@ -1,13 +1,10 @@
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by yy on 2017/4/29.
  */
 public class HelloJava {
     public static void main(String[] args) {
 
-        System.out.println("hello java");
+        //System.out.println("hello java");
 
         //try {
         //    new MyThrower().exceptionThrower();
@@ -22,18 +19,28 @@ public class HelloJava {
         //int sum1 = new MathDemo2().sum(11, 22);
         //System.out.println(sum1);
 
+        //Set<Integer> sets = new TreeSet<>(((o1, o2) -> {if(o1 - o2 >= 0) return 1;else return -1;}));
+        //sets.add(1);
+        //sets.add(1);
+        //sets.add(1);
+        //System.out.println(sets);
+
+
+
+
+
     }
-    public static List<Integer> getNumbers(){
-        List<Integer> list = new ArrayList<>();
-        list.add(11);
-        list.add(22);
-        list.add(33);
-        list.add(44);
-        return list;
-    }
-    public static Integer sum(List<Integer> list){
-        return list.stream().mapToInt(e->e).sum();
-    }
+    //public static List<Integer> getNumbers(){
+    //    List<Integer> list = new ArrayList<>();
+    //    list.add(11);
+    //    list.add(22);
+    //    list.add(33);
+    //    list.add(44);
+    //    return list;
+    //}
+    //public static Integer sum(List<Integer> list){
+    //    return list.stream().mapToInt(e->e).sum();
+    //}
 }
 
 class MathDemo implements MathTrait{

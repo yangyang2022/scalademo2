@@ -1,0 +1,19 @@
+
+1:类型成员 && 参数化类型
+ abstract class BulkRead{
+    type In
+    val source:In
+    def read:String
+ }
+ class StringBulkReader(val source:String) extends BulkReader{
+    type In = String
+    def read:String = source
+ }
+
+2: 方法调用链: def isEven = (s:Int) => s % 2 == 0
+                  List(1,2,3,4,5,6) filter isEven foreach println
+
+3: scala中任何以:结尾的方法均与其右边对象绑定,他们并不与左边对象绑定
+   例如: :: , 'a'::List('b') == List.::('a')
+
+4:
