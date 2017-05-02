@@ -129,16 +129,94 @@ object HelloDemo {
 //        println(m(Seq(1,2,3)))
 //        println(m(Seq("hello","world")))
 
-        import Interpolators._
-        val name ="yangyang"
-        val book = "Programing scala"
-        val jsonobj = json"{name: $name ,book:$book}"
-        println(jsonobj)
+//        import Interpolators._
+//        val name ="yangyang"
+//        val book = "Programing scala"
+//
+//        val jsonobj = json"{name: $name ,book:$book}"
+//        println(jsonobj)
 
+//        implicit class AddressToJson(address: Address)extends ToJson{
+//            override def toJson(level: Int): String = {
+//                val (outdent,indent) = indentation(level)
+//                s"""{
+//                  |${indent}"street":"${address.street}",
+//                  |${indent}"city":   "${address.city}"
+//                  |$outdent}
+//                """.stripMargin
+//            }
+//        }
+//        implicit class PersonToJson(person: Person) extends ToJson{
+//
+//            override def toJson(level: Int): String = {
+//                val (outdent,indent) = indentation(level)
+//                s"""{
+//                  |${indent}"name":   "${person.name}"
+//                  |${indent}"address": "${person.address.toJson(level+1)}"
+//                  |$outdent}
+//                """.stripMargin
+//            }
+//        }
+//
+//        val a = Address("Scala Lane","Anytown")
+//        val p = Person("Bulk Trends",a)
+//        println(a.toJson())
+//        println()
+//        println(p.toJson())
+
+//        def m(pair:Tuple2[Int,String]) = println(pair)
+//        m(1,"two")
+
+//        var factor = 2
+//        val multiplier = (i:Int) => i*factor
+//        val sum1 = (1 to 10) filter (_%2 ==0 ) map multiplier reduce(_*_)
+//        factor = 3
+//        val sum2 = (1 to 10) filter (_%2 ==0 ) map multiplier reduce(_*_)
+//        println(sum1)
+//        println(sum2)
+//
+//        def m1(multiplier:Int=>Int) = {
+//            (1 to 10) filter (_%2 ==0 ) map multiplier reduce(_*_)
+//        }
+//        def m2:Int=>Int = {
+//            var factor = 2
+//            val mm = (i:Int) => i*factor
+//            mm
+//        }
+//        println(m1(m2))
+//        factor =4
+//        println(m1(m2))
+
+
+//        val seq = Seq("hello","seq")
+//        val seq1 = seq :+ "end"
+//        val seq2 = "head" +: seq
+//        println(seq)
+//        println(seq1)
+//        println(seq2)
+//        val list = (List(1,2,3,4,5,6) foldRight List.empty[String]){
+//            (x,list) => ("["+x+"]")::list
+//        }
+//        println(list)
+//        val list2 = (List(1,2,3,4,5,6) foldLeft List.empty[String]){
+//            (list,x) => ("["+x+"]")::list
+//        }
+//        println(list2)
+//        println((0 /: List(1,2,3))(_-_))
+
+        println("hello scala")
 
 
 
     }
+}
+
+case class Address(street:String,city:String)
+case class Person(name:String,address: Address)
+trait ToJson{
+    def toJson(level:Int = 0):String
+    val INDENTATION = " "
+    def indentation(level:Int=0):(String,String) = (INDENTATION*level,INDENTATION*(level+1))
 }
 
 object Interpolators{
@@ -147,6 +225,7 @@ object Interpolators{
         def json(values:Any*):JSONObject = {
             val keyre = """^[\s{,]*(\S+):\s*""".r
             println("parts: "+sc.parts)
+            println(values)
 
             val keys = sc.parts map{
                 case keyre(key) => key

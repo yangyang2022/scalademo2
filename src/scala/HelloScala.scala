@@ -18,46 +18,46 @@ import scala.util.Random
 //import util.control.Breaks.break
 
 //case class Person(firstname:String,lastname:String)
-class Person(var firstname:String,var lastname:String){
-    def this(firstname:String){
-        this(firstname,"default")
-    }
-    println("constrcutors begin ....")
-    private val home = System.getProperty("user.home")
-    var age = 10
-
-    //some method
-    override def toString: String = s"$firstname $lastname is ${age} years old"
-
-    def printhome{println(s" home is ${home}")}
-    def printfullname{println(this)}
-    printhome
-    printfullname
-    println("still in constructors ... ")
-}
-object Person{
-
-    def apply() = new Person("defaut","default")
-    def apply(name:String) = new Person(name)
-    def apply(firstname:String,lastname:String) = new Person(firstname,lastname)
-
-}
+//class Person(var firstname:String,var lastname:String){
+//    def this(firstname:String){
+//        this(firstname,"default")
+//    }
+//    println("constrcutors begin ....")
+//    private val home = System.getProperty("user.home")
+//    var age = 10
+//
+//    //some method
+//    override def toString: String = s"$firstname $lastname is ${age} years old"
+//
+//    def printhome{println(s" home is ${home}")}
+//    def printfullname{println(this)}
+//    printhome
+//    printfullname
+//    println("still in constructors ... ")
+//}
+//object Person{
+//
+//    def apply() = new Person("defaut","default")
+//    def apply(name:String) = new Person(name)
+//    def apply(firstname:String,lastname:String) = new Person(firstname,lastname)
+//
+//}
 object HelloScala {
-    implicit class StringImprovment(s:String){
-        def increment = s.map(c=>(c+1).toChar)
-        def decrement= s.map(c=>(c-1).toChar)
-        def hidall = s.replaceAll(".","*")
-
-//        def plusOne = s.toInt + 1
-        def asBoolean = s match {
-            case "0" |"zero" | "" | " " => false
-            case _ => true
-        }
-    }
-
-    implicit class StringToInt(s:String){
-        def toInt(radix:Int = 10) = Integer.parseInt(s,radix)
-    }
+//    implicit class StringImprovment(s:String){
+//        def increment = s.map(c=>(c+1).toChar)
+//        def decrement= s.map(c=>(c-1).toChar)
+//        def hidall = s.replaceAll(".","*")
+//
+////        def plusOne = s.toInt + 1
+//        def asBoolean = s match {
+//            case "0" |"zero" | "" | " " => false
+//            case _ => true
+//        }
+//    }
+//
+//    implicit class StringToInt(s:String){
+//        def toInt(radix:Int = 10) = Integer.parseInt(s,radix)
+//    }
 
     def main(args: Array[String]): Unit = {
 
