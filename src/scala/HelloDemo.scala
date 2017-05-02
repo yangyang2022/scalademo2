@@ -204,7 +204,6 @@ object HelloDemo {
 //        println(list2)
 //        println((0 /: List(1,2,3))(_-_))
 
-        println("hello scala")
 
 
 
