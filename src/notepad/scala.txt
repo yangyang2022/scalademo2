@@ -2,6 +2,10 @@
 0: scala通过使用隐试转换特征,可以得到另一种通过静态类型实现元编程的方法,称之为 类型类(type class)(Haskell里面的概念)
   如果莫对象属于某类型类,那么他必须实现类型类所定义的行为,与通常意义的类相比,类型类更接近于接口
 
+0.1:scala里面的集合类型: (1)可变与不可变 (2)及时和延迟计算 (3)线性和并行
+0.2: List是一个单链表,适用于表头和尾部的递归算法 Vector是一个嵌套数组,在分割和连接时非常有效率
+0.3: Scala的Stream是延迟计算 而 Haskell的List是延迟计算的
+0.4: scala里面定义类型: (1)class trait object (2) type定义类型
 
 
 1:类型成员 && 参数化类型
@@ -46,3 +50,58 @@
               }
           }
           countLines("scala.txt")
+
+
+5: scala集合
+                        Traversable
+                        Iterable
+                seq             set            map
+      IndexedSeq LinearSeq    SortedSet    SortedMap
+                                BitSet
+
+6: scala 中的Array有2个隐式转换类ArrayOps(临时改变返回的还是数组,优先级高) and WrappedArray (改变原始数组)
+   另外一个是 String and StringOps and StringWrapper
+
+7:  并发队列操作         异常版本      特殊值版本        计时等待版本              阻塞版本
+     出队          remove():T      poll():T       poll(t:Long,u:Time)      take():T
+     入队          add(x:T)        offer(x:T):Boolean  offer(x:T,t:T)      put(x:T)
+     检查下一个元素  element:T       peek:T              无                   无
+
+8: ArrayBlockingQueue 有界阻塞队列(生产者>消费者)  LinkingBlockingQueue(无届队列,消费者>生产者)
+
+8.1 :同步: synchronize volatile explicit lock atomic
+
+9: 线程安全: 当多个线程访问某个类时,这个类始终表现出正确的行为,那么这个类就是线程安全的
+   竞态条件(race condition): 由于不恰当的执行时序而出现不正确的结果就叫竞态条件
+
+10: 可并行化集合: Array ArrayBuffer (可变)HashMap HashSet Range Vector (不可变)HashMap HashSet (并发)TrieMap
+    调用这些集合的.par方法会创建一个新的并行集合,该集合会与原来的集合共享相同的基础数据集,无需复制任何元素,而且转换速度非常快.
+
+11: HotSpot优化:
+   (1)Method Inlining:HotSpot能够判断是否在调用点直接把被调用的小方法内容嵌入进去
+   (2)On Stack Replacement:(栈替换) HotSpot能够判断一个变量应该放在Stack还是Heap里面
+   (3)Escape Analysis:(逃逸分析) HotSpot能够分析各种东西是否逃逸(escape)了特定的作用域
+   (4)Dynamic De-optimization:(动态去优化):HotSpot有能力判断一个优化是否事实上没有提升性能,然后取消该优化,改用其他优化
+12:
+    def test[A,B](f:A=>B) = new (A=>B){
+			def apply(x:A):B = f(x)
+		}
+		def memorize[A,B](f:A=>B) = new (A=>B){
+			val cache = scala.collection.mutable.Map[A,B]()
+			def apply(x:A):B = cache.getOrElseUpdate(x,f(x))
+			cache.foreach{case (k,v) => println(k+" -> "+v)}
+		}
+
+		def adder(x:Int) = x + 1
+
+		def e = (x:Int) => x+2
+
+		def namehsah = memorize(adder)
+		def tt = test(e)
+
+		println(tt(1))
+		println(tt(2))
+		println(tt(3))
+
+13: def foo[A <% B](x:A) = x == def foo[A](x:A)(implicit $env0:A=>B) = x (试图边界)
+    def foo[A:B](x:A) = x == def foo[A](x:A)(implicit $env0:B[A]) = x     (上下文边界)
