@@ -811,8 +811,262 @@ object HelloScala {
 //			count += 1
 //		}
 
+//		object Serialization{
+//			case class Rem[A](a: A){
+//				def serialized:String = s"-- $a --"
+//			}
+//			type Writable[A] = A => Rem[A]
+//
+//			implicit val fromInt:Writable[Int] = (i:Int) => Rem(i)
+//			implicit val fromFloat:Writable[Float] = (f:Float) =>Rem(f)
+//			implicit val fromString:Writable[String] = (s:String) =>Rem(s)
+//		}
+//		import Serialization._
+//		object RemoteConnection{
+//			def write[T:Writable](t:T):Unit = println(t.serialized)
+//		}
+//		RemoteConnection.write(100)
+//		RemoteConnection.write(100.11f)
+//		RemoteConnection.write("hello scala")
+
+		trait Add[T]{
+			def add(t1:T,t2:T):T
+		}
+		object Add{
+			implicit val addInt = new Add[Int] {
+				override def add(t1: Int, t2: Int): Int = t1+t2
+			}
+			implicit val addPair = new Add[(Int,Int)]{
+				override def add(t1: (Int, Int), t2: (Int, Int)): (Int, Int) = (t1._1+t2._1,t2._2+t2._2)
+			}
+			implicit val addString = new Add[String] {
+				override def add(t1: String, t2: String): String = t1.concat(t2)
+			}
+		}
+		val seq = Seq(1,2,3,4,5)
+		val sum2 = seq.reduce(implicitly[Add[Int]].add(_,_))
+//		println(s"sum2 $sum2")
+//		def sumSeq[T:Add](seq: Seq[T]):T = seq reduce(implicitly[Add[T]].add(_,_))
+//
+//		case class MyList[A](list: List[A]){
+//			def sortedBY[B:Ordering](f:A=>B):List[A] = list.sortBy(f)(implicitly[Ordering[B]])
+//		}
+
+//		println(sumSeq(1 to 10))
+//		println(sumSeq(Vector(1->10,2->20,3->30)))
+//		println(sumSeq(Seq("hello","world","shen","yangyang")))
+
+//		import scala.language.higherKinds
+//		trait Reduce[T,-M[_]]{
+//			def reduce(seq: M[T])(f:(T,T)=>T):T
+//		}
+//		object Reduce{
+//			implicit def seqReduce[T] = new Reduce[T,Seq] {
+//				override def reduce(seq: Seq[T])(f: (T, T) => T): T = seq reduce f
+//			}
+//			implicit def optionReduce[T] = new Reduce[T,Option] {
+//				override def reduce(opt: Option[T])(f: (T, T) => T): T = opt reduce f
+//			}
+//		}
+//		def sum[T:Add,M[_]](container:M[T])(implicit red: Reduce[T,M]):T = red.reduce(container)(implicitly[Add[T]].add(_,_))
+//
+//		trait Reduce1[-M[T]]{
+//			def reduce[T](m: M[T])(f:(T,T)=>T):T
+//		}
+//		object Reduce1{
+//			implicit val seqReduce = new Reduce1[Seq] {
+//				override def reduce[T](m: Seq[T])(f: (T, T) => T): T = m reduce f
+//			}
+//			implicit val optionReduce = new Reduce1[Option] {
+//				override def reduce[T](m: Option[T])(f: (T, T) => T): T = m reduce f
+//			}
+//		}
+//		def sum1[T:Add,M[_]:Reduce1](container:M[T]):T = implicitly[Reduce1[M]].reduce(container)(implicitly[Add[T]].add(_,_))
+
+//		println(sum(Vector(1->10,2->20,3->30)))
+//		println(sum(1 to 10))
+//		println(sum(Option(998)))
+//
+//		println(sum1(Vector(1->10,2->20,3->30)))
+//		println(sum1(1 to 10))
+//		println(sum1(Option(998)))
+//		println(sum[Int,Option](None))
+
+		trait Reduce[T,-M[_]]{
+			def reduce(m: M[T])(f:(T,T)=>T):T
+		}
+		object Reduce{
+			implicit def seqReduce[T] = new Reduce[T,Seq] {
+				override def reduce(m: Seq[T])(f: (T, T) => T): T = m reduce f
+			}
+			implicit def optionReduce[T] = new Reduce[T,Option] {
+				override def reduce(m: Option[T])(f: (T, T) => T): T = m reduce f
+			}
+		}
+		def sum[T:Add,M[_]](container:M[T])(implicit red:Reduce[T,M]) = red.reduce(container)(implicitly[Add[T]].add(_,_))
+
+//		println(sum(Vector(1->10,2->20,3->30)))
+//		println(sum(1 to 10))
+//		println(sum(Option(998)))
+
+		trait Reduce1[-M[_]]{
+			def reduce[T](m: M[T])(f:(T,T)=>T):T
+		}
+		object Reduce1{
+			implicit val seqReduce = new Reduce1[Seq] {
+				override def reduce[T](m: Seq[T])(f: (T, T) => T): T = m reduce f
+			}
+			implicit val optReduce = new Reduce1[Option] {
+				override def reduce[T](m: Option[T])(f: (T, T) => T): T = m reduce f
+			}
+		}
+		def sum1[T:Add,M[_]:Reduce1](container:M[T]):T = implicitly[Reduce1[M]].reduce(container)(implicitly[Add[T]].add(_,_))
+
+//		println(sum1(Vector(1->10,2->20,3->30)))
+//		println(sum1(1 to 10))
+//		println(sum1(Option(998)))
+
+//
+//		trait Functor[A,+M[_]]{
+//			def map2[B](f:A=>B):M[B]
+//		}
+//		object Functor{
+//			implicit class SeqFunctor[A](seq: Seq[A]) extends Functor[A,Seq]{
+//				override def map2[B](f: (A) => B): Seq[B] = seq map f
+//			}
+//			implicit class OptionFunctor[A](opt:Option[A]) extends Functor[A,Option]{
+//				override def map2[B](f: (A) => B): Option[B] = opt map f
+//			}
+//			implicit class MapFunctor[K,V1](mapKV1:Map[K,V1]) extends Functor[V1,({type X[Y] = Map[K,Y]})#X]{
+//				override def map2[B](f: (V1) => B): Map[K, B] = mapKV1 map {
+//					case (k,v) => (k,f(v))
+//				}
+//			}
+//		}
+//		import Functor._
+//		println(List(1,2,3) map2(_*2))
+//		println(Option(2) map2(_*2))
+//		val m = Map("one"->1,"two"->2,"three"->3)
+//		println(m map2(_*2))
+
+//		trait Parent[T <: Parent[T]]{
+//			def make:T
+//		}
+//		case class Child1(s:String) extends Parent[Child1]{
+//			override def make: Child1 = Child1(s"Child1 make: $s")
+//		}
+//		case class Child2(s:String) extends Parent[Child2]{
+//			override def make: Child2 = Child2(s"Child2 make: $s")
+//		}
+//		val c1 = Child1("c1")
+//		val c2 = Child1("c2")
+//		val c11 = c1.make
+//		val c22 = c2.make
+//
+//		println(c1)
+//		println(c2)
+//		println(c11)
+//		println(c22)
+
+		trait Functor[F[_]]{ //F is a container
+			def map3[A,B](fa:F[A])(f:A=>B):F[B]
+		}
+		object FunctionF{
+			def map[A,A2,B](func:A=>A2)(f:A2=>B):A=>B = {
+				val functor = new Functor[({type X[Y] = A => Y})#X] {
+					def map3[A3,B](func:A=>A3)(f:A3=>B):A=>B = (a:A) => f(func(a))
+				}
+				functor.map3(func)(f)
+			}
+		}
+		object SeqF extends Functor[Seq]{
+			override def map3[A, B](fa: Seq[A])(f: (A) => B): Seq[B] = fa map f
+		}
+		object OptionF extends Functor[Option]{
+			override def map3[A, B](fa: Option[A])(f: (A) => B): Option[B] = fa map f
+		}
+//		val fii:Int=>Int = i=>i*2
+//		val fid:Int =>Double = i => i*2.1
+//		val fds:Double=>String = d =>d.toString
+//
+//		println(SeqF.map3(List(1,2,3))(fii))
+//		println(SeqF.map3(List())(fii))
+//
+//		println(OptionF.map3(Some(2))(fii))
+//		println(OptionF.map3(None)(fii))
+//
+//		val fa = FunctionF.map(fid)(fds)
+//		println(fa(2))
+//
+//		val fb = FunctionF.map[Int,Double,String](fid)(fds)
+//		println(s"fb: ${fb(2)}")
+
+//		def foo[M[_]](f:M[Int]) = f
+//		foo[({type X[Y] = Y => Unit})#X]((x:Int)=>println(x))(123)
+
+		trait Monad[M[_]]{
+			def flatmap[A,B](fa:M[A])(f:A=>M[B]):M[B]
+			def unit[A](a: =>A):M[A]
+			//some others
+			def bind[A,B](fa:M[A])(f:A=>M[B]):M[B] = flatmap(fa)(f)
+			def >>=[A,B](fa:M[A])(f:A=>M[B]):M[B] = flatmap(fa)(f)
+			def pure[A](a: =>A):M[A] = unit(a)
+			def `return`[A](a: =>A):M[A] = unit(a)
+		}
+		object SeqM extends Monad[Seq]{
+			override def flatmap[A, B](fa: Seq[A])(f: (A) => Seq[B]): Seq[B] = fa flatMap f
+			override def unit[A](a: => A): Seq[A] = Seq(a)
+		}
+		object OptionM extends Monad[Option]{
+			override def flatmap[A, B](fa: Option[A])(f: (A) => Option[B]): Option[B] = fa flatMap f
+
+			override def unit[A](a: => A): Option[A] = Option(a)
+		}
+
+		val seqF:Int=>Seq[Int] = i => 1 to i
+		val optf:Int=>Option[Int] = i => Option(i+1)
+
+//		println(SeqM.flatmap(List(1,2,3,4,5))(seqF))
+//		println(SeqM.flatmap(List.empty[Int])(seqF))
+//		println(OptionM.flatmap(Some(9))(optf))
+//		println(OptionM.flatmap(None)(optf))
+
+		import scala.util.{Success,Failure,Try}
+		type Step = Int=> Try[Int]
+		val successFulSteps:Seq[Step] = List((i:Int)=>Success(i+5),(i:Int)=>Success(i+10))
+		val partiallySucc:Seq[Step] = List((i:Int)=>Success(i+5),(i:Int)=>Failure(throw new RuntimeException("FAIL!!!")))
+
+		def sumCounts(countSteps:Seq[Step]):Try[Int] = {
+			val zero:Try[Int] = Success(0)
+			(countSteps foldLeft zero){
+				(sumTry,step)=>sumTry flatMap(i=>step(i))
+			}
+		}
+//		println(sumCounts(successFulSteps))
+//		println(sumCounts(partiallySucc))
 
 
+//		val list = List(1,2,3,4,5)
+//		println(list.foldRight(0)(_-_))
+//		println("list: "+list.reduceRight(_-_))
+//		val fl = (acc:String,x:String)=>s"($acc)-($x)"
+//		val fr = (x:String,y:String)=>s"($y)-($x)"
+//
+//		val list2 = list.map(_.toString)
+//		println(list2.reduceRight(fr))
+//		println(list.reduceRight(_-_))
+
+		object RemoveBlanks{
+			def apply(path:String,compressBlank:Boolean = false): Seq[String] ={
+				for{
+					line <- Source.fromFile(path).getLines.toSeq
+					if !line.matches("""^\s*$""")
+						line2 = if(compressBlank) line.replaceAll("\\s+"," ") else line
+				} yield line2
+			}
+		}
+		val blanks = RemoveBlanks(filepath,compressBlank = true)
+		blanks.foreach(println)
 
 
 	}
